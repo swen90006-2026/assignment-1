@@ -1,0 +1,266 @@
+Specs of five methods:
+-- registerAccount
+-- login
+-- checkOutstandingTickets
+-- issueTicket
+-- payTicket
+
+Below are the names of methods students may use when writing test cases. For details, please refer to the comments at the top of the relevant code implementation.
+-- isRegistered
+-- isAuthenticated
+-- getRole
+-- isAnyAdminAuthenticated
+-- getOutstandingBalance
+-- hasOutstandingTickets
+-- getTicketCount
+-- getTicket
+-- isSavedTicket
+
+----------------------------------------------------------------------------------------------------
+
+Data types used across the spec:
+
+Role: an enum with two values, VEHICLE_OWNER and ADMIN. Every registered account has exactly
+one Role, fixed at registration time.
+
+FineType: an enum representing the type of parking violation a ticket was issued for. Each
+FineType has a fixed, system-defined fine amount that is not supplied by the caller of
+issueTicket:
+  -- OVERSTAYED_PARKING       -> $65.00
+  -- NO_STANDING_ZONE         -> $90.00
+  -- EXPIRED_METER            -> $55.00
+  -- DISABLED_PARKING_MISUSE  -> $300.00
+
+Ticket (nested data type, returned by checkOutstandingTickets): represents one issued parking
+fine. Not one of the five methods under test, but its shape is documented here since it is
+part of the observable behaviour of the system. Fields (all read via public getters, none are
+settable from outside the PFMS class):
+- ticketID: String, system-generated, unique.
+- plateNumber: String, the fined vehicle owner's username (plate number).
+- fineType: FineType, the type of violation this ticket was issued for.
+- fineAmount: double, fixed to fineType's fine amount at the time the ticket was issued.
+- amountPaid: double, initialised to 0.0, increased only via payTicket.
+
+----------------------------------------------------------------------------------------------------
+
+registerAccount:
+
+Creates a new account with an authentication status of NOT_AUTHENTICATED and the given role.
+There are two kinds of account: VEHICLE_OWNER accounts, whose username is the vehicle's plate
+number, and ADMIN accounts, whose username is an admin-chosen identifier. Both kinds of
+account are registered through this single method, with role determining which username
+format is required.
+
+Signature:
+  public void registerAccount(String username, String password, Role role)
+      throws DuplicateAccountException, InvalidUsernameException, InvalidPasswordException
+
+Parameters:
+- username: The identifier for the account. For a VEHICLE_OWNER, this is the vehicle's plate
+  number. For an ADMIN, this is an admin-chosen username.
+- password: The password for the account.
+- role: The role of the account being registered (VEHICLE_OWNER or ADMIN).
+
+Requirements:
+
+- Username:
+  - Must not have been registered previously (regardless of role).
+  - If role is VEHICLE_OWNER (a plate number):
+    - Must be between 6 and 8 characters long (inclusive).
+    - Must contain only upper-case letters (A-Z) and digits (0-9).
+    - Must contain at least one letter and at least one digit.
+  - If role is ADMIN:
+    - Must be between 4 and 12 characters long (inclusive).
+    - Must contain only lower- and upper-case letters (a-z, A-Z).
+
+- Password:
+  - Must be between 10 and 16 characters long (inclusive).
+  - Must contain at least one letter (a-z, A-Z).
+  - Must contain at least one digit (0-9).
+  - Must contain at least one special character (anything other than a-z, A-Z, or 0-9)
+
+Exceptions (thrown in order):
+- DuplicateAccountException: Thrown if the username is already registered.
+- InvalidUsernameException: Thrown if the username does not meet the role-specific requirements above.
+- InvalidPasswordException: Thrown if the password does not meet the specified requirements.
+
+For example:
+-- DuplicateAccountException is thrown first (i.e., existing usernames are all valid)
+-- If username is invalid for the given role, then we do not check for a valid password
+-- If username is valid, only then we check for a valid password
+
+Assumptions:
+-- username, password and role are non-null.
+-- Whether a username is checked against the VEHICLE_OWNER rules or the ADMIN rules depends
+   only on the role parameter passed to this call, not on the shape of the username itself.
+-- There is no limit on the number of ADMIN accounts that may be registered.
+
+----------------------------------------------------------------------------------------------------
+
+login:
+
+Authenticates an account using a username and password, then updates that account's
+authentication status. The username may identify either a VEHICLE_OWNER account (a plate
+number) or an ADMIN account; login behaves identically for both roles.
+
+Signature:
+  public void login(String username, String password)
+      throws NoSuchAccountException, IncorrectPasswordException
+
+Parameters:
+- username: The username of the account being logged into.
+- password: The password associated with the account being logged into.
+
+Requirements:
+- If the account exists and the password is correct, it sets the stored authentication status
+  for username to AUTHENTICATED.
+- If either the account does not exist, or the password is incorrect, it throws an exception.
+  If the account exists but the password is incorrect, the stored authentication status for
+  username is set to NOT_AUTHENTICATED.
+
+Exceptions (thrown in order):
+- NoSuchAccountException: Thrown if username is not registered.
+- IncorrectPasswordException: Thrown if the password does not match the account identified by username.
+
+Assumptions:
+- username and password are non-null.
+- This method does not validate whether username or password follows the constraints defined
+  in registerAccount; it only checks them against what was stored at registration time.
+
+----------------------------------------------------------------------------------------------------
+
+checkOutstandingTickets:
+
+Allows a user to retrieve the list of outstanding (i.e. not fully paid) tickets for a given
+plateNumber. This method can be used both by the vehicle owner (to check their own tickets)
+and by an admin (to check any vehicle's tickets).
+
+Signature:
+  public List<Ticket> checkOutstandingTickets(String plateNumber)
+      throws NoSuchAccountException, IncorrectAccountRoleException, UnauthenticatedAccountException
+
+Parameters:
+- plateNumber: The plate number whose outstanding tickets are being requested.
+
+Requirements:
+- The plateNumber must be registered.
+- The account identified by plateNumber must have role VEHICLE_OWNER.
+- This method may only be called if at least one of the following holds at the time of the
+  call:
+  -- the account identified by plateNumber is currently authenticated (i.e. that vehicle
+     owner is logged in), or
+  -- at least one ADMIN account is currently authenticated (i.e. some admin is logged in).
+- A ticket is considered outstanding if its fineAmount is strictly greater than its
+  amountPaid. Tickets that are fully paid (amountPaid == fineAmount) are not included in the
+  result.
+
+Returns:
+- A List<Ticket> of all outstanding tickets belonging to plateNumber, in the order they were
+  issued. The list is empty (not null) if there are no outstanding tickets.
+
+Exceptions (thrown in order):
+- NoSuchAccountException: Thrown if plateNumber is not registered.
+- IncorrectAccountRoleException: Thrown if plateNumber is registered but its role is not VEHICLE_OWNER.
+- UnauthenticatedAccountException: Thrown if neither the plateNumber's owner nor any admin is
+  currently authenticated.
+
+Assumptions:
+- plateNumber is non-null.
+- Tickets are stored in the order they were issued (insertion order).
+- "Any admin authenticated" is a system-wide check: it does not matter which specific admin
+  account is logged in, only that at least one is.
+
+----------------------------------------------------------------------------------------------------
+
+issueTicket:
+
+Allows any currently authenticated admin to issue a new parking fine ticket against a
+registered vehicle owner, for a given type of parking violation. Each ticket is given a
+unique, system-generated ticket number, and is initialised with amountPaid equal to zero. The
+fine amount charged is fixed by fineType (see FineType above) and is not supplied by the
+caller. The generated ticket number is returned to the caller, so that it can later be used to
+make a payment against that specific ticket (see payTicket).
+
+Signature:
+  public String issueTicket(String plateNumber, FineType fineType)
+      throws NoSuchAccountException, IncorrectAccountRoleException, UnauthenticatedAdminException
+
+Parameters:
+- plateNumber: The plate number of the vehicle owner being fined.
+- fineType: The type of parking violation being fined; determines the fine amount charged.
+
+Requirements:
+- The plateNumber must be registered.
+- The account identified by plateNumber must have role VEHICLE_OWNER.
+- At least one ADMIN account must be currently authenticated.
+- On success, a new ticket is appended to the system with a unique ticket number, the given
+  plateNumber and fineType, fineAmount set to fineType's fixed fine amount, and amountPaid
+  initialised to 0.0. The new ticket's ticket number is returned.
+
+Returns:
+- The system-generated ticket number (a String) of the newly issued ticket.
+
+Exceptions (thrown in order):
+- NoSuchAccountException: Thrown if plateNumber is not registered.
+- IncorrectAccountRoleException: Thrown if plateNumber is registered but its role is not VEHICLE_OWNER.
+- UnauthenticatedAdminException: Thrown if no admin account is currently authenticated.
+
+Assumptions:
+- plateNumber and fineType are non-null.
+- Ticket numbers are assigned sequentially by the system (e.g. "T1", "T2", ...) and are never
+  reused, even if tickets are later fully paid.
+- A vehicle owner may hold any number of tickets, including duplicates of the same fineType.
+- Any authenticated admin may issue a ticket; the system does not track or restrict which
+  admin issued which ticket.
+- If issueTicket throws an exception, no ticket number is generated and nothing is returned.
+
+----------------------------------------------------------------------------------------------------
+
+payTicket:
+
+Allows a payment to be made towards one specific ticket, identified by its ticketNumber
+(as returned by issueTicket), belonging to a given plateNumber.
+
+Signature:
+  public void payTicket(String plateNumber, String ticketNumber, double amount)
+      throws NoSuchAccountException, IncorrectAccountRoleException, NoSuchTicketException,
+            InvalidPaymentAmountException, NoOutstandingTicketException, OverpaymentException
+
+Parameters:
+- plateNumber: The plate number the payment is being made against.
+- ticketNumber: The ticket number of the specific ticket being paid, as returned by
+  issueTicket.
+- amount: The dollar amount being paid.
+
+Requirements:
+- The plateNumber must be registered.
+- The account identified by plateNumber must have role VEHICLE_OWNER.
+- ticketNumber must identify a ticket that exists in the system and that belongs to
+  plateNumber (i.e. the ticket's stored plateNumber must equal the plateNumber parameter).
+- amount must be strictly greater than 0.
+- The identified ticket must currently be outstanding (i.e. its fineAmount must be strictly
+  greater than its amountPaid).
+- amount must not exceed the identified ticket's own outstanding balance
+  (fineAmount - amountPaid); the system does not accept partial payment of a request that
+  would overpay that ticket.
+- If accepted, amount is added to the identified ticket's amountPaid.
+
+Exceptions (thrown in order):
+- NoSuchAccountException: Thrown if plateNumber is not registered.
+- IncorrectAccountRoleException: Thrown if plateNumber is registered but its role is not VEHICLE_OWNER.
+- NoSuchTicketException: Thrown if ticketNumber does not identify a ticket belonging to
+  plateNumber (this covers both "ticket number does not exist" and "ticket number exists but
+  belongs to a different plateNumber").
+- InvalidPaymentAmountException: Thrown if amount is not strictly greater than 0.
+- NoOutstandingTicketException: Thrown if the identified ticket has already been fully paid
+  (amountPaid == fineAmount).
+- OverpaymentException: Thrown if amount is strictly greater than the identified ticket's
+  outstanding balance.
+
+Assumptions:
+- plateNumber and ticketNumber are non-null. amount is a signed double.
+- A ticket's "outstanding balance" is (fineAmount - amountPaid) for that one ticket only;
+  payTicket never affects any ticket other than the one identified by ticketNumber.
+- This method does not require the plateNumber or any admin to be logged in; anyone who knows
+  a valid plateNumber/ticketNumber pair may pay down that ticket (e.g. on behalf of the
+  registered owner).
