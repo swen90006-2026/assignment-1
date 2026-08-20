@@ -1,4 +1,4 @@
-## SWEN90006 Assignment 1 (Practice): Testing the Parking Fine Management System
+## SWEN90006 Assignment 1: Testing the Parking Fine Management System
 
 In this assignment, you will test a simplified Parking Fine Management System (PFMS), used by
 a local council to register accounts, issue parking fine tickets, and process payments against
