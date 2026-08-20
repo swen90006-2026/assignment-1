@@ -1,6 +1,7 @@
-Specs of five methods:
+Specs of six methods:
 -- registerAccount
 -- login
+-- logout
 -- checkOutstandingTickets
 -- issueTicket
 -- payTicket
@@ -9,6 +10,7 @@ Below are the names of methods students may use when writing test cases. For det
 -- isRegistered
 -- isAuthenticated
 -- getRole
+-- getActiveUsername
 -- isAnyAdminAuthenticated
 -- getOutstandingBalance
 -- hasOutstandingTickets
@@ -97,28 +99,43 @@ Assumptions:
 
 ----------------------------------------------------------------------------------------------------
 
+System-wide assumption -- single active session:
+
+The system supports at most one active (logged-in) user at any time, regardless of role. An
+account must call logout before a different account is able to log in via login. Attempting
+to log in while any account (including the same one) is already logged in fails with
+SystemBusyException, regardless of whether the attempted username/password are themselves
+valid. This assumption is what allows checkOutstandingTickets and issueTicket to determine
+"who is asking" without an explicit caller/requester parameter: at any point in time there is
+at most one candidate, so isAuthenticated(username) unambiguously means "username is the
+current active user."
+
+----------------------------------------------------------------------------------------------------
+
 login:
 
-Authenticates an account using a username and password, then updates that account's
-authentication status. The username may identify either a VEHICLE_OWNER account (a plate
+Authenticates an account using a username and password, and makes it the system's single
+active (logged-in) user. The username may identify either a VEHICLE_OWNER account (a plate
 number) or an ADMIN account; login behaves identically for both roles.
 
 Signature:
   public void login(String username, String password)
-      throws NoSuchAccountException, IncorrectPasswordException
+      throws SystemBusyException, NoSuchAccountException, IncorrectPasswordException
 
 Parameters:
 - username: The username of the account being logged into.
 - password: The password associated with the account being logged into.
 
 Requirements:
-- If the account exists and the password is correct, it sets the stored authentication status
-  for username to AUTHENTICATED.
-- If either the account does not exist, or the password is incorrect, it throws an exception.
-  If the account exists but the password is incorrect, the stored authentication status for
-  username is set to NOT_AUTHENTICATED.
+- No account (including this same one) may already be logged in.
+- The account identified by username must exist.
+- The password must match the account identified by username.
+- If all of the above hold, username becomes the system's active user.
 
 Exceptions (thrown in order):
+- SystemBusyException: Thrown if any account is already logged in. This check does not depend
+  on username or password at all -- it is checked first, before username or password are
+  looked at.
 - NoSuchAccountException: Thrown if username is not registered.
 - IncorrectPasswordException: Thrown if the password does not match the account identified by username.
 
@@ -126,6 +143,35 @@ Assumptions:
 - username and password are non-null.
 - This method does not validate whether username or password follows the constraints defined
   in registerAccount; it only checks them against what was stored at registration time.
+- An unsuccessful login attempt (any of the three exceptions) never changes who the system's
+  active user is.
+- If the currently active user attempts to log in again (even with their own correct
+  credentials), SystemBusyException is still thrown; there is no special case for "re-logging
+  in" as the same user.
+
+----------------------------------------------------------------------------------------------------
+
+logout:
+
+Logs out the system's current active user, freeing the single active-session slot so a
+different account may subsequently log in.
+
+Signature:
+  public void logout() throws NoActiveSessionException
+
+Parameters:
+- (none)
+
+Requirements:
+- An account must currently be logged in.
+- On success, the system's active user is cleared (nobody is logged in afterwards).
+
+Exceptions (thrown in order):
+- NoActiveSessionException: Thrown if no account is currently logged in.
+
+Assumptions:
+- logout does not take a username parameter: since at most one account can ever be active,
+  there is no ambiguity about who is being logged out.
 
 ----------------------------------------------------------------------------------------------------
 
@@ -145,11 +191,10 @@ Parameters:
 Requirements:
 - The plateNumber must be registered.
 - The account identified by plateNumber must have role VEHICLE_OWNER.
-- This method may only be called if at least one of the following holds at the time of the
-  call:
-  -- the account identified by plateNumber is currently authenticated (i.e. that vehicle
-     owner is logged in), or
-  -- at least one ADMIN account is currently authenticated (i.e. some admin is logged in).
+- This method may only be called if the system's current active user (see the single active
+  session assumption above) is either:
+  -- the account identified by plateNumber itself (i.e. that vehicle owner is logged in), or
+  -- an account with role ADMIN.
 - A ticket is considered outstanding if its fineAmount is strictly greater than its
   amountPaid. Tickets that are fully paid (amountPaid == fineAmount) are not included in the
   result.
@@ -161,25 +206,26 @@ Returns:
 Exceptions (thrown in order):
 - NoSuchAccountException: Thrown if plateNumber is not registered.
 - IncorrectAccountRoleException: Thrown if plateNumber is registered but its role is not VEHICLE_OWNER.
-- UnauthenticatedAccountException: Thrown if neither the plateNumber's owner nor any admin is
-  currently authenticated.
+- UnauthenticatedAccountException: Thrown if the system's current active user is neither
+  plateNumber's owner nor an admin (including the case where nobody is currently logged in).
 
 Assumptions:
 - plateNumber is non-null.
 - Tickets are stored in the order they were issued (insertion order).
-- "Any admin authenticated" is a system-wide check: it does not matter which specific admin
-  account is logged in, only that at least one is.
+- Because at most one account can be active at a time (see the single active session
+  assumption), this check is unambiguous: there is exactly one candidate active user to
+  compare against, not several.
 
 ----------------------------------------------------------------------------------------------------
 
 issueTicket:
 
-Allows any currently authenticated admin to issue a new parking fine ticket against a
-registered vehicle owner, for a given type of parking violation. Each ticket is given a
-unique, system-generated ticket number, and is initialised with amountPaid equal to zero. The
-fine amount charged is fixed by fineType (see FineType above) and is not supplied by the
-caller. The generated ticket number is returned to the caller, so that it can later be used to
-make a payment against that specific ticket (see payTicket).
+Allows the current active user, if they are an admin, to issue a new parking fine ticket
+against a registered vehicle owner, for a given type of parking violation. Each ticket is
+given a unique, system-generated ticket number, and is initialised with amountPaid equal to
+zero. The fine amount charged is fixed by fineType (see FineType above) and is not supplied by
+the caller. The generated ticket number is returned to the caller, so that it can later be
+used to make a payment against that specific ticket (see payTicket).
 
 Signature:
   public String issueTicket(String plateNumber, FineType fineType)
@@ -192,7 +238,8 @@ Parameters:
 Requirements:
 - The plateNumber must be registered.
 - The account identified by plateNumber must have role VEHICLE_OWNER.
-- At least one ADMIN account must be currently authenticated.
+- The system's current active user (see the single active session assumption above) must
+  exist and have role ADMIN.
 - On success, a new ticket is appended to the system with a unique ticket number, the given
   plateNumber and fineType, fineAmount set to fineType's fixed fine amount, and amountPaid
   initialised to 0.0. The new ticket's ticket number is returned.
@@ -203,15 +250,17 @@ Returns:
 Exceptions (thrown in order):
 - NoSuchAccountException: Thrown if plateNumber is not registered.
 - IncorrectAccountRoleException: Thrown if plateNumber is registered but its role is not VEHICLE_OWNER.
-- UnauthenticatedAdminException: Thrown if no admin account is currently authenticated.
+- UnauthenticatedAdminException: Thrown if the system's current active user does not exist or
+  does not have role ADMIN.
 
 Assumptions:
 - plateNumber and fineType are non-null.
 - Ticket numbers are assigned sequentially by the system (e.g. "T1", "T2", ...) and are never
   reused, even if tickets are later fully paid.
 - A vehicle owner may hold any number of tickets, including duplicates of the same fineType.
-- Any authenticated admin may issue a ticket; the system does not track or restrict which
-  admin issued which ticket.
+- Because at most one account can be active at a time, "the active user is an admin" always
+  refers to a single, specific admin account; the system does not track or restrict which
+  admin issued which ticket beyond that.
 - If issueTicket throws an exception, no ticket number is generated and nothing is returned.
 
 ----------------------------------------------------------------------------------------------------
@@ -263,4 +312,5 @@ Assumptions:
   payTicket never affects any ticket other than the one identified by ticketNumber.
 - This method does not require the plateNumber or any admin to be logged in; anyone who knows
   a valid plateNumber/ticketNumber pair may pay down that ticket (e.g. on behalf of the
-  registered owner).
+  registered owner). In particular, payTicket may be called freely regardless of who (if
+  anyone) currently holds the system's single active session.

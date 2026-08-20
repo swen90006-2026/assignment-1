@@ -1,23 +1,23 @@
 ## SWEN90006 Assignment 1 (Practice): Testing the Parking Fine Management System
 
 In this assignment, you will test a simplified Parking Fine Management System (PFMS), used by
-a local council to register vehicle owner accounts, issue parking fine tickets, and process
-payments against those tickets. The system enables vehicle owners and an authorised council
-authority to manage parking fines. To support these features, the system provides functions
-for users to:
+a local council to register accounts, issue parking fine tickets, and process payments against
+those tickets. The system supports two kinds of account -- vehicle owners and council admins
+-- and enables both to manage parking fines. To support these features, the system provides
+functions for users to:
 
-- register vehicle owner accounts,
-- authenticate using either a vehicle owner's or the council authority's credentials,
+- register an account as either a vehicle owner or an admin,
+- log in and log out (the system allows at most one logged-in account at a time),
 - check a vehicle's outstanding (unpaid) tickets,
-- issue a new parking fine ticket, and
-- pay down a vehicle's outstanding tickets.
+- issue a new parking fine ticket for a specific type of parking violation, and
+- pay down one specific outstanding ticket.
 
-Each ticket is recorded with a ticket ID, the fined plate number, the fine amount, and the
-amount paid so far (initialised to zero), allowing the system to track which fines remain
-outstanding. For simplicity, the system uses a Java data structure as its database. It is
-assumed that the implementation has no security vulnerabilities, and all these functions are
-intended for use by vehicle owners and authorised council staff under appropriate access
-controls.
+Each ticket is recorded with a ticket number, the fined plate number, the type of violation
+and its associated fine amount, and the amount paid so far (initialised to zero), allowing the
+system to track which fines remain outstanding. For simplicity, the system uses a Java data
+structure as its database. It is assumed that the implementation has no security
+vulnerabilities, and all these functions are intended for use by vehicle owners and authorised
+council staff under appropriate access controls.
 
 This assignment focuses on input partitioning, boundary-value analysis, control-flow testing,
 and briefly examines mutation testing.
@@ -105,6 +105,8 @@ Edit **`id.txt`**, replacing the sample ID with your own, making sure it only in
 #### Task 1 -- Equivalence Partitioning
 
 Using the specifications in **PFMSSpec.txt**, apply equivalence partitioning to find equivalence classes for the following methods in the API: `registerAccount`, `login`, `checkOutstandingTickets`, `issueTicket`, and `payTicket`.
+
+**Note:** `PFMS.java` also provides a `logout` method. `logout` is a secondary method for this assignment -- it exists to support the single active-session model described in **PFMSSpec.txt**, but you do **not** need to derive equivalence classes or a test template tree for it, and it is not one of the methods used for the coverage-based testing or mutation testing tasks below. You may still call it in your test setup wherever your tests need to log out before logging in as someone else.
 
 **Important:** For this task, only refer to the specifications in **PFMSSpec.txt**. While the `PFMS.java` file includes Javadoc comments, these are for overall software quality, not test case derivation. Since this is black-box testing, you must base your test cases solely on **PFMSSpec.txt**.
 
