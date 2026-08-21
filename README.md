@@ -142,10 +142,10 @@ Include this as Appendix B in your submission.
 Evaluate the effectiveness of two test suites (equivalence partitioning and boundary-value analysis). For this task, you should complete these three sub-tasks:
 
 1. Draw a control flow graph of the `payTicket` method.
-2. Determine the coverage score of your two test suites using *condition coverage* for the `isValidPlateNumber` method. Note that you can access the source code in the Coverage-based Testing section, and the `isValidPlateNumber` method is called by the `registerAccount` method.
-3. Determine the coverage score of your two test suites using *multi-condition coverage* for the `registerAccount` method.
+2. Determine the coverage score of your two test suites using *condition coverage* for the `isValidPlateNumber` method.
+3. Determine the coverage score of your two test suites using *multi-condition coverage* for the `isValidPlateNumber` method.
 
-**Note:** For the entire Coverage-based Testing section, you do not need to consider any inter-procedural analysis, which means you only need to use the information available for that function. For example, when examining the `login` method, there is no need to draw a control flow graph or measure coverage based on inside the methods called within `login`.
+**Note:** For the entire Coverage-based Testing section, you do not need to consider any inter-procedural analysis, which means you only need to use the information available for that function. For example, when examining the `payTicket` method, there is no need to draw a control flow graph or measure coverage based on inside the methods called within `payTicket`.
 Present your coverage calculation work in a table that lists each test objective (i.e., each combination for multiple-condition coverage or each condition for condition coverage) and one test that achieves it, if any.
 
 Marks will be awarded for each sub-task: correctly drawing the control flow graph, accurately calculating coverage scores, and clearly demonstrating how these scores were derived. No marks are given for solely having a higher coverage score.
