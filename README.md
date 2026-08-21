@@ -225,14 +225,18 @@ Some tips for managing the assignment, particularly regarding equivalence partit
 
 4. If you cannot figure out how to start your test template tree, just begin by listing tests that you think are important. Once you have a list, consider arranging them into a tree.
 
-### Late submission policy
+### Extensions and Special Consideration
 
-For details on late submissions, please refer to the **FEIT Extensions and Special Consideration** page on the
+Please refer to the **FEIT Extensions and Special Consideration** page on the
 subject Canvas site.
 
 ### Academic Misconduct
 
 The University academic integrity policy applies. Students are encouraged to discuss the assignment topic, but all submitted work must reflect the individual's understanding of the topic.
+
+All work that you submit for assessment at the University must be your own, original work. Where the ideas or words of other people, or outputs produced by tools, including AI and other software tools are included, these must always be appropriately acknowledged and cited. This includes editing and translation assistance or tools (e.g. Grammarly), if permitted. Failure to do so will be reported as potential academic misconduct and subject to appropriate penalties.
+
+All submissions must be produced as authorised and specified in the assessment task as set by the subject coordinator. You are responsible for the quality and content of your final submission.
 
 ### Originality Multiplier
 
