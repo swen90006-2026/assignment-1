@@ -102,7 +102,7 @@ successful, as well as the number of tests that passed or failed.
 
 You may clone this repository and work on a local copy on your computer, or store your work in your own GitHub repository. If you use GitHub, make sure that your repository is private. Do NOT fork this repository directly, as doing so may make your work publicly accessible.
 
-Edit **`id.txt`**, replacing the sample ID with your own, making sure it only includes your student ID. For example, if my student number is 190000, I would change the placeholder 123456 to 190000, with no other information. The teaching team uses this to automatically mark your JUnit tests. You will lose a significant number of points if we cannot identify your GitHub repo.
+Edit **`id.txt`**, replacing the sample ID with your own, making sure it only includes your student ID. For example, if my student number is 190000, I would change the placeholder 123456 to 190000, with no other information. The teaching team uses this to automatically mark your JUnit tests.
 
 #### Task 1 -- Equivalence Partitioning
 
