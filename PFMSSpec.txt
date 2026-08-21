@@ -212,9 +212,6 @@ Exceptions (thrown in order):
 Assumptions:
 - plateNumber is non-null.
 - Tickets are stored in the order they were issued (insertion order).
-- Because at most one account can be active at a time (see the single active session
-  assumption), this check is unambiguous: there is exactly one candidate active user to
-  compare against, not several.
 
 ----------------------------------------------------------------------------------------------------
 
