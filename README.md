@@ -120,7 +120,7 @@ Finally, ensure your set of equivalence classes covers the entire input space. J
 
 #### Task 2 -- JUnit Test Driver for Equivalence Partitioning
 
-Select test cases linked to your equivalence classes and implement them in the JUnit test driver located at `tests/swen90006/pfms/PartitioningTests.java`. Use *one* JUnit test method for each equivalence class. Clearly identify which class each test case has been selected from. Once complete, push this script to your Git repository.
+Select test cases linked to your equivalence classes and implement them in the JUnit test driver located at `tests/swen90006/pfms/PartitioningTests.java`. Use *one* JUnit test method for each equivalence class. Clearly identify which class each test case has been selected from.
 
 Include this as Appendix A in your submission.
 
@@ -132,7 +132,8 @@ Perform a boundary-value analysis for your equivalence classes. Document your pr
 
 #### Task 4 -- JUnit Test Driver for Boundary-Value Analysis
 
-Implement your boundary-value tests in the JUnit test driver located at `tests/swen90006/pfms/BoundaryTests.java`. As before, use *one* JUnit test method for each test input. Once complete, push this script to your Git repository.
+Implement your boundary-value tests in the JUnit test driver located at `tests/swen90006/pfms/BoundaryTests.java`. As before, use *one* JUnit test method for each test input.
+
 Include this as Appendix B in your submission.
 
 **Note:** The `BoundaryTests` JUnit script inherits from `PartitioningTests`, meaning all tests from `PartitioningTests` are included in `BoundaryTests`. A JUnit test is simply a standard public Java class! You can remove this inheritance if desired, but you may also use it to your advantage to simplify creating the `BoundaryTests` script. Overriding an existing test will replace it in the `BoundaryTests` script.
