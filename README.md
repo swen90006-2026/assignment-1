@@ -98,7 +98,7 @@ successful, as well as the number of tests that passed or failed.
 
 ### Your Tasks:
 
-#### Task 0 -- Clone the repository and identify Yourself
+#### Task 0 -- Clone the repository and identify yourself
 
 You may clone this repository and work on a local copy on your computer, or store your work in your own GitHub repository. If you use GitHub, make sure that your repository is private. Do NOT fork this repository directly, as doing so may make your work publicly accessible.
 
