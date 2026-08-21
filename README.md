@@ -100,6 +100,8 @@ successful, as well as the number of tests that passed or failed.
 
 #### Task 0 -- Identify Yourself
 
+You may clone this repository and work on a local copy on your computer, or store your work in your own GitHub repository. If you use GitHub, make sure that your repository is private. Do NOT fork this repository directly, as doing so may make your work publicly accessible.
+
 Edit **`id.txt`**, replacing the sample ID with your own, making sure it only includes your student ID. For example, if my student number is 190000, I would change the placeholder 123456 to 190000, with no other information. The teaching team uses this to automatically mark your JUnit tests. You will lose a significant number of points if we cannot identify your GitHub repo.
 
 #### Task 1 -- Equivalence Partitioning
@@ -198,20 +200,19 @@ Staff_mutant_score = (staff_mutants_killed / 5) * 2
 
 ## Submission instructions
 
-### JUnit script submission
+### Code submission
 
-For the JUnit test scripts, we will clone everyone's repository at the due time. We will mark the latest version on the main branch of the repository. To have any late submissions marked, please email the Head Tutor to let us know so we can pull changes from your repository.
-Some important instructions:
+You will submit a ZIP file via the link on the subject Canvas site. Navigate to the SWEN90006 Canvas site, select *Assignments* from the subject menu, and submit in *Assignment 1 code*. The ZIP file contains your copy of this repository, including all of your changes. Please follow these important instructions:
 
 1. Do NOT change the package names in any of the files.
 2. Do NOT change the directory structure.
-3. Do NOT add any new files; you should be able to complete the assignment without adding any new source files.
+3. Do NOT add any new files. You should be able to complete the assignment without adding any new source files.
 
-JUnit scripts will be batch run automatically, so any script that does not follow these instructions will not run and will not be awarded any marks.
+We will assess your code by unzipping your submission and automatically running JUnit tests. If your submission does not follow the instructions above, the tests may not run correctly, and you may not receive marks for the affected parts of the assignment.
 
 ### Report submission
 
-For the remainder of the assignment (test template tree, boundary-value analysis, coverage, and discussion) submit a PDF file via the links on the subject Canvas site. Navigate to the SWEN90006 Canvas site, select *Assignments* from the subject menu, and submit in *Assignment 1 report*.
+For the remainder of the assignment (test template tree, boundary-value analysis, coverage, and discussion) submit a PDF file via the link on the subject Canvas site. Navigate to the SWEN90006 Canvas site, select *Assignments* from the subject menu, and submit in *Assignment 1 report*.
 
 ## Tips
 
@@ -234,9 +235,7 @@ subject Canvas site.
 
 The University academic integrity policy applies. Students are encouraged to discuss the assignment topic, but all submitted work must reflect the individual's understanding of the topic.
 
-All work that you submit for assessment at the University must be your own, original work. Where the ideas or words of other people, or outputs produced by tools, including AI and other software tools are included, these must always be appropriately acknowledged and cited. This includes editing and translation assistance or tools (e.g. Grammarly), if permitted. Failure to do so will be reported as potential academic misconduct and subject to appropriate penalties.
-
-All submissions must be produced as authorised and specified in the assessment task as set by the subject coordinator. You are responsible for the quality and content of your final submission.
+You are not allowed to use generative AI (e.g., LLMs) to complete the main tasks of this assignment. However, you may use generative AI for grammar correction in your report.
 
 ### Originality Multiplier
 
