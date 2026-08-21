@@ -67,7 +67,7 @@ Check that the JDK is installed and that the `JAVA_HOME` environment variable is
 
 - **Apache Ant:** Ant is used to automate the build process. You can install Ant using Homebrew `brew install ant` (for macOS users) or by downloading it from the official [Apache Ant website](https://ant.apache.org/).
 
-- **Integrated Development Environment (IDE):** While any Java IDE will do, **IntelliJ IDEA** is recommended for its extensive support, including Ant integration, code completion, and debugging tools.
+- **(Optional) Integrated Development Environment (IDE):** While any Java IDE will do, **IntelliJ IDEA** is recommended for its extensive support, including Ant integration, code completion, and debugging tools.
 
 **Build Instructions:** The `build.xml` file contains **targets** for tasks such as compiling code (transforming
 Java source files into bytecode), running tests (checking functionality), and defining configurations like program version (`original` or `mutant`) and
